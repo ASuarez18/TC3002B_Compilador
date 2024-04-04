@@ -1,3 +1,5 @@
+import functions as fun
+
 filename = input("Nombre del programa: ") + ".txt"
 fileContent = []
 
@@ -6,8 +8,10 @@ try:
         fileContent = file.readlines()
         print("\n Exito en lectura de archivo")
         file.close()
+
         for line in fileContent:
-            print(line.strip())
+            for char in line.strip():
+                print("'" + char + "'")
 
 except FileNotFoundError:
     print ("\nEl archivo no fue encontrado")
