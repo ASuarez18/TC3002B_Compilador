@@ -1,4 +1,6 @@
-main() {
-    prints("hello, world\n");;;
-    return 42;;;
-}
+<# a
+#>
+
+# CEM
+
+"a\""

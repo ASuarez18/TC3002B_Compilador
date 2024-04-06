@@ -1,67 +1,59 @@
-
-# Structure
-'''
-- Alpha (A-Z,a-z)
-- Digit  (0-9)
-- Tokens
-    - Identifiers
-        + Letters, digits, undersore (_)
-        + Upper & Lower are different
-    - Keywords
-        - break
-        - if
-        - elseif
-        - else
-        - dec
-        - do
-        - return
-        - true
-        - false
-        - var
-        - inc
-        - while
-    - Literals
-        - Booleans
-            - true (1)
-            - false (0)
-        - Integers
-            + 0..n digits
-            + Range = -2,147,483,648 to 2,147,483,647
-        - Characters
-        - Strings
-    - Operators
-        - Arithmetic
-            - Minus (-)
-                + -x (negate)
-                + x - y (substraction)
-            - Plus (+)
-                - +x (Produces)
-                - x + y (Addition)
-            - Multiplication (x * y)
-            - Division (x / y)
-            - Remainder (x % y)
-        - Logical
-            - Not (!x)
-            - And (x && y)
-            - Or (x || y)
-            - Xor (x ^ y)
-        - Comparison and Relational
-            - Equal (x == y)
-            - Not equal (x != y)
-            - Greater (x > y)
-            - Less (x < y)
-            - Greater Equal (x >= y)
-            - Less Equal (x <= y)
-        - Function call (f(arg1,..., argn))
+def changeState(prevState, word):
+    match prevState:
+        case 1: 
+            match word:
+                # Keywords basicas
+                case "if": return "if_kwd"
+                case "else": return "else_kwd"
+                case "elseif": return "elseif_kwd"
+                case "true": return "true_kwd"
+                case "false": return "false_kwd"
+                case "while": return "while_kwd"
+                case "do": return "do_kwd"
+                case "return": return "return_kwd"
+                case "break": return "break_kwd"
+                case "dec": return "dec_kwd"
+                case "inc": return "inc_kwd"
+                case "var": return "var_kwd"
+                # Keywords API I/O Operations
+                case "printi": return "printi_kwd_api"
+                case "printc": return "printc_kwd_api"
+                case "prints": return "prints_kwd_api"
+                case "println": return "println_kwd_api"
+                case "readi": return "readi_kwd_api"
+                case "reads": return "reads_kwd_api"
+                # Keywords API Array Operations
+                case "new": return "new_kwd_api"
+                case "add": return "add_kwd_api"
+                case "get": return "get_kwd_api"
+                case "set": return "set_kwd_api"
+                case _: return "ID"
+        case 2:
+            return "number"
+    return None
 
 
-    - White space (Delimiters between tokens)
-        - Spaces
-        - Tabulators
-        - Newlines
-        - Comments
-            - Single (#)
-            - Multi-line(<# #>)
-
-
-'''
+def operator(char):
+    match char:
+        case '+': return "plus_op"
+        case '-': return "minus_op"
+        case '*': return "multi_op"
+        case '/': return "div_op"
+        case '%': return "reminder_op"
+        case '!': return "not_op"
+        case '&': return "and_op"
+        case '|': return "or_op"
+        case '^': return "xor_op"
+        case '>': return "greater_op"
+        case '=': return "equal_op"
+        case '[': return "sqbracket1_op"
+        case ']': return "sqrbracket2_op"
+        case '(': return "bracket1_op"
+        case ')': return "bracket2_op"
+        case ';': return "limit_op"
+        case '{': return "curly1_op"
+        case '}': return "curly2_op"
+        case ',': return "comma_op"
+        
+# def keywords(word):
+    

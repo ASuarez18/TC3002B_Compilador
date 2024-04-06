@@ -2,80 +2,140 @@ import functions as fun
 
 filename = input("Nombre del programa: ") + ".txt"
 fileContent = []
+operators = [ '+', '-', '*', '/', '%', '!', '&', '|', '^', '>', '=', '[', ']', '(', ')', ';', '{', '}', ',']
+reset = [' ', '\n']
+history = []
+word = ""
+
+def checkState(state, char, word, blocked):
+    newState = -1
+    if char.isdigit() and not blocked and state != 1:
+        newState = 2
+
+    elif (char.isalnum() or char == '_') and not blocked:
+        newState = 1
+
+    elif char in operators and not blocked:
+        newState = 3
+
+    elif char == '<' and not blocked:
+        newState = 8
+
+    elif char in reset and not blocked:
+        newState = 0
+    
+    elif char == '#' and not blocked and state != 8:
+        newState = 4
+        history.append("line_comment")
+
+    elif char == '#' and not blocked and state == 8:
+        newState = 5
+        history.append("multi_comment")
+
+    elif char == '\'' and not blocked:
+        newState = 6
+        history.append("character")
+
+    elif char == '"' and not blocked:
+        newState = 7
+        history.append("string")
+
+    elif char == '\n' and blocked and state == 4:
+        newState = 0
+
+    elif char == '\'' and blocked and state == 6:
+        newState = 0
+
+    elif char == '"' and blocked and state == 7:
+        newState = 0
+
+    elif char == '>' and blocked and state == 9:
+        newState = 0
+
+    elif char != '>' and blocked and state == 9:
+        newState = 5
+
+    elif char == '#' and blocked and state == 5:
+        newState = 9
+
+    elif state == 6 and char == '\\':
+        newState = 10
+
+    elif state == 7 and char == '\\':
+        newState = 11
+
+    elif state == 10:
+        newState = 6
+
+    elif state == 11:
+        newState = 7
+
+    elif not blocked:
+        newState = 404
+        history.append("Error")
+
+    if state == 8 and newState != 5 and not blocked:
+        history.append("lesser_op")
+
+    if newState != -1 and newState != state:
+        if state == 1 or state == 2:
+            token = fun.changeState(state, word)
+            history.append(token)
+        return newState
+    else:
+        return state
 
 try:
+    blocked = False
     with open(filename, 'r') as file:
         fileContent = file.readlines()
         print("\n Exito en lectura de archivo")
         file.close()
 
         state = 0 # Estado
-        spc = False # Espacio
         err = False # Error
-        pCnt = 0 # Parentesis Cuenta
 
         for line in fileContent:
             for char in line:
-                print("'" + char + "'")
-            # ----- Switch -----
-    
-            # Inicio
-            if state == 0: state = 0
-            # Inicio Variable
-            elif state == 1: state = 1
-            # Variable
-            elif state == 2: state = 2
-            # Asignacion
-            elif state == 3: state = 3
-            # Entero
-            elif state == 4: state = 4
-            # Negativo
-            elif state == 5: state = 5
-            # Parentesis Apertura
-            elif state == 6: state = 6
-            # Parentesis Cierre
-            elif state == 7: state = 7
-            # Comentario Linea
-            elif state == 8: state = 8
-            # 
-            elif state == 9: state = 9
-            # 
-            elif state == 10: state = 10
-            # 
-            elif state == 11: state = 11
-            # 
-            elif state == 12: state = 12
-            # 
-            elif state ==13 : state = 13
-            # 
-            elif state == 14: state = 14
-            # 
-            elif state == 15: state = 15
-            # 
-            elif state == 16: state = 16
-            # 
-            elif state == 17: state = 17
-            # 
-            elif state == 18: state = 18
-            # 
-            elif state == 19: state = 19
-            # 
-            elif state == 20: state = 20
-            # 
-            elif state == 21: state = 21
-            # 
-            elif state == 22: state = 22
-            # 
-            elif state == 23: state = 23
-            # 
-            elif state == 24: state = 24
-            # 
-            elif state == 25: state = 25 
+                state = checkState(state, char, word, blocked)
+                if state != 1:
+                    word = ""
+                
+                match state:
+                    # Init Restart state
+                    case 0: 
+                        blocked = False
+                    # Alpha state
+                    case 1: 
+                        word += char
+                    case 3: 
+                        token = fun.operator(char)
+                        history.append(token)
+                    case 4: 
+                        blocked = True
+                    case 5: 
+                        blocked = True
+                    case 6: 
+                        blocked = True
+                    case 7: 
+                        blocked = True
+
+            if state == 1 or state == 2:
+                token = fun.changeState(state, word)
+                history.append(token)
+            
+            if state == 8:
+                history.append("lesser_op")
+
+                    
 
 except FileNotFoundError:
     print ("\nEl archivo no fue encontrado")
 except IOError:
     print ("\nError al abrir el archivo")
-except Exception as e:
-    print("\nError: " + e)
+# except Exception as e:
+#     print("\nError: " + e)
 
+print(history)
+# for line in history:
+#     print(line)
