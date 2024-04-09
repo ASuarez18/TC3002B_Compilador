@@ -133,9 +133,6 @@ except FileNotFoundError:
     print ("\nEl archivo no fue encontrado")
 except IOError:
     print ("\nError al abrir el archivo")
-# except Exception as e:
-#     print("\nError: " + e)
+
 
 print(history)
-# for line in history:
-#     print(line)
