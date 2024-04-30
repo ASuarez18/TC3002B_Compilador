@@ -1,0 +1,89 @@
+P' -> PROGRAM
+PROGRAM -> DEF_LIST
+DEF_LIST -> DEF_LIST DEF
+DEF_LIST -> ''
+DEF -> VAR_DEF
+DEF -> FUN_DEF
+VAR_DEF -> var_kwd VAR_LIST limit_op
+VAR_LIST -> ID_LIST
+ID_LIST -> ID ID_LIST_CONT
+ID_LIST_CONT -> coma_op ID ID_LIST_CONT
+ID_LIST_CONT -> ''
+FUN_DEF -> ID bracket1_op PARAM_LIST bracket2_op curly1_op VAR_DEF_LIST STMT_LIST curly2_op
+PARAM_LIST -> ID_LIST
+PARAM_LIST -> ''
+VAR_DEF_LIST -> VAR_DEF_LIST VAR_DEF
+VAR_DEF_LIST -> ''
+STMT_LIST -> STMT_LIST STMT
+STMT_LIST -> ''
+STMT -> STMT_ASSIGN
+STMT -> STMT_INCR
+STMT -> STMT_DECR
+STMT -> STMT_FUN_CALL
+STMT -> STMT_IF
+STMT -> STMT_WHILE
+STMT -> STMT_DO_WHILE
+STMT -> STMT_BREAK
+STMT -> STMT_RETURN
+STMT -> STMT_EMPTY
+STMT_ASSIGN -> ID equal_op EXPR limit_op
+STMT_INCR -> inc_kwd ID limit_op
+STMT_DECR -> dec_kwd ID limit_op
+STMT_FUN_CALL -> FUN_CALL limit_op
+FUN_CALL -> ID bracket1_op EXPR_LIST bracket2_op
+EXPR_LIST -> EXPR EXPR_LIST_CONT
+EXPR_LIST -> ''
+EXPR_LIST_CONT -> coma_op EXPR EXPR_LIST_CONT
+EXPR_LIST_CONT -> ''
+STMT_IF -> if_kwd bracket1_op EXPR bracket2_op curly1_op STMT_LIST curly2_op ELSE_IF_LIST ELSE
+ELSE_IF_LIST -> ELSE_IF_LIST ELSE_IF
+ELSE_IF_LIST -> ''
+ELSE_IF -> elseif_kwd bracket1_op EXPR bracket2_op curly1_op STMT_LIST curly2_op
+ELSE -> else_kwd curly1_op STMT_LIST curly2_op
+ELSE -> ''
+STMT_WHILE -> while_kwd bracket1_op EXPR bracket2_op curly1_op STMT_LIST curly2_op
+STMT_DO_WHILE -> do_kwd curly1_op STMT_LIST curly2_op while_kwd bracket1_op EXPR bracket2_op limit_op
+STMT_BREAK -> break_kwd limit_op
+STMT_RETURN -> return_kwd EXPR limit_op
+STMT_EMPTY -> limit_op
+EXPR -> EXPR_OR
+EXPR_OR -> EXPR_OR OP_OR EXPR_AND
+OP_OR -> or_op
+OP_OR -> xor_op
+EXPR_OR -> EXPR_AND
+EXPR_AND -> EXPR_AND and_op EXPR_COMP
+EXPR_AND -> EXPR_COMP
+EXPR_COMP -> EXPR_COMP OP_COMP EXPR_REL
+EXPR_COMP -> EXPR_REL
+OP_COMP -> equal_equal_op
+OP_COMP -> not_equal_op
+EXPR_REL -> EXPR_REL OP_REL EXPR_ADD
+EXPR_REL -> EXPR_ADD
+OP_REL -> lesser_op
+OP_REL -> lesser_equal_op
+OP_REL -> greater_op
+OP_REL -> greater_eq_op
+EXPR_ADD -> EXPR_ADD OP_ADD EXPR_MUL
+EXPR_ADD -> EXPR_MUL
+OP_ADD -> plus_op
+OP_ADD -> minus_op
+EXPR_MUL -> EXPR_MUL OP_MUL EXPR_UNARY
+EXPR_MUL -> EXPR_UNARY
+OP_MUL -> multi_op
+OP_MUL -> div_op
+OP_MUL -> reminder_op
+EXPR_UNARY -> OP_UNARY EXPR_UNARY
+EXPR_UNARY -> EXPR_PRIMARY
+OP_UNARY -> plus_op
+OP_UNARY -> minus_op
+OP_UNARY -> not_op
+EXPR_PRIMARY -> ID
+EXPR_PRIMARY -> FUN_CALL
+EXPR_PRIMARY -> ARRAY
+EXPR_PRIMARY -> LIT
+EXPR_PRIMARY -> bracket1_op EXPR bracket2_op
+ARRAY -> sqrbracket1_op EXPR_LIST sqrbracket2_op
+LIT -> bool_kwd
+LIT -> number
+LIT -> character
+LIT -> string
