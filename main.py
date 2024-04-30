@@ -1,6 +1,9 @@
+import pandas as pd
+import numpy as np
 import functions as fun
 
-filename = input("Nombre del programa: ") + ".txt"
+#filename = input("Nombre del programa: ") + ".txt"
+filename = "var.txt"
 fileContent = []
 operators = [ '+', '-', '*', '/', '%', '^', '[', ']', '(', ')', ';', '{', '}', ',']
 reset = [' ', '\n']
@@ -41,11 +44,11 @@ def checkState(state, char, word, blocked):
     
     elif char == '#' and not blocked and state != 8:
         newState = 4
-        history.append("line_comment")
+        #history.append("line_comment")
 
     elif char == '#' and not blocked and state == 8:
         newState = 5
-        history.append("multi_comment")
+        #history.append("multi_comment")
 
     elif char == '\'' and not blocked:
         newState = 6
@@ -192,3 +195,56 @@ except IOError:
 
 print(history)
 
+def load_slr_matrix(file_path):
+    try:
+        slr_matrix = pd.read_excel(file_path)
+        return slr_matrix
+    except Exception as e:
+        print("Error al cargar la matriz SLR:", e)
+        return None
+
+def load_grammar_rules(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            rules = [line.strip() for line in file.readlines()]
+        return rules
+    except Exception as e:
+        print("Error al cargar las reglas gramaticales:", e)
+        return None
+
+#matrix_path = input("Nombre de la matriz: ") + ".xlsx"
+matrix_path = "Transitions.xlsx"
+slr_matrix = load_slr_matrix(matrix_path)
+if slr_matrix is not None:
+    print("Matriz SLR cargada exitosamente:")
+    print(slr_matrix)
+
+slr_matrix_matrixed = slr_matrix.to_numpy()
+column_names = slr_matrix.columns.tolist()
+#slr_matrix_matrixed_ = np.vstack([column_names, slr_matrix_matrixed])
+
+#rules_path = input("Nombre de las reglas: ") + ".txt"
+rules_path = "Rules.txt"
+rules = load_grammar_rules(rules_path)
+if rules is not None:
+    print("Reglas gramaticales cargadas exitosamente:")
+    for rule in rules:
+        print(rule)
+
+column_tokens = {column_name: i for i, column_name in enumerate(column_names)}
+slr_matrix_numeric = slr_matrix.replace(column_tokens)
+history_numeric = [column_tokens[token] for token in history]
+
+print(history_numeric)
+
+estado_inicial = 0
+pila = [estado_inicial]
+
+
+def obtener_accion(estado, token):
+    return slr_matrix_matrixed[estado][token]
+
+def aplicar_reduccion(regla):
+    return rules[regla]
+
+print (slr_matrix_matrixed[0][0])
