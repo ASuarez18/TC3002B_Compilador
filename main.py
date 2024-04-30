@@ -2,7 +2,7 @@ import functions as fun
 
 filename = input("Nombre del programa: ") + ".txt"
 fileContent = []
-operators = [ '+', '-', '*', '/', '%', '!', '&', '|', '^', '>', '=', '[', ']', '(', ')', ';', '{', '}', ',']
+operators = [ '+', '-', '*', '/', '%', '^', '[', ']', '(', ')', ';', '{', '}', ',']
 reset = [' ', '\n']
 history = []
 word = ""
@@ -18,11 +18,26 @@ def checkState(state, char, word, blocked):
     elif char in operators and not blocked:
         newState = 3
 
-    elif char == '<' and not blocked:
+    elif char == '<' and not blocked and state != 8:
         newState = 8
 
+    elif char == '>' and not blocked and state in [0,19]:
+        newState = 14
+
+    elif char == '=' and not blocked and state in [0,19]:
+        newState = 15
+
+    elif char == '!' and not blocked and state in [0,19]:
+        newState = 16
+
+    elif char == '|' and not blocked and state in [0,19]:
+        newState = 17
+
+    elif char == '&' and not blocked and state in [0,19]:
+        newState = 18
+
     elif char in reset and not blocked:
-        newState = 0
+        newState = 19
     
     elif char == '#' and not blocked and state != 8:
         newState = 4
@@ -39,6 +54,30 @@ def checkState(state, char, word, blocked):
     elif char == '"' and not blocked:
         newState = 7
         history.append("string")
+
+    elif char == '=' and not blocked and state == 8:
+        newState = 20
+        history.append("lesser_equal_op")
+    
+    elif char == '=' and not blocked and state == 14:
+        newState = 20
+        history.append("greater_equal_op")
+
+    elif char == '=' and not blocked and state == 15:
+        newState = 20
+        history.append("equal_equal_op")
+
+    elif char == '=' and not blocked and state == 16:
+        newState = 20
+        history.append("not_equal_op")
+
+    elif char == '|' and not blocked and state == 17:
+        newState = 20
+        history.append("or_op")
+
+    elif char == '&' and not blocked and state == 18:
+        newState = 20
+        history.append("and_op")
 
     elif char == '\n' and blocked and state == 4:
         newState = 0
@@ -74,8 +113,24 @@ def checkState(state, char, word, blocked):
         newState = 404
         history.append("Error")
 
-    if state == 8 and newState != 5 and not blocked:
+    if state == 8 and newState != 5 and newState != 20 and not blocked:
         history.append("lesser_op")
+
+    if state == 14 and newState != 20 and not blocked:
+        history.append("greater_op")
+
+    if state == 15 and newState != 20 and not blocked:
+        history.append("equal_op")
+
+    if state == 16 and newState != 20 and not blocked:
+        history.append("not_op")
+
+    if state in [17,18] and newState != 20 and not blocked:
+        newState = 404
+        history.append("Error")
+
+    if state in [8, 14, 15, 16, 17, 18] and newState == 20 and not blocked:
+        newState = 0
 
     if newState != -1 and newState != state:
         if state == 1 or state == 2:
@@ -136,3 +191,4 @@ except IOError:
 
 
 print(history)
+
