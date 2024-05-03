@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import functions as fun
 
 #filename = input("Nombre del programa: ") + ".txt"
