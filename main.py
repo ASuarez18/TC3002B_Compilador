@@ -3,7 +3,7 @@ import numpy as np
 import functions as fun
 
 #filename = input("Nombre del programa: ") + ".txt"
-filename = "var.txt"
+filename = "t.txt"
 fileContent = []
 operators = [ '+', '-', '*', '/', '%', '^', '[', ']', '(', ')', ';', '{', '}', ',']
 reset = [' ', '\n']
@@ -216,17 +216,18 @@ def load_grammar_rules(file_path):
 matrix_path = "Transitions.xlsx"
 slr_matrix = load_slr_matrix(matrix_path)
 if slr_matrix is not None:
-    print("Matriz SLR cargada exitosamente:")
-    print(slr_matrix)
+    print("Matriz SLR cargada exitosamente.")
+    #print(slr_matrix)
 
 slr_matrix_matrixed = slr_matrix.to_numpy()
 column_names = slr_matrix.columns.tolist()
-#slr_matrix_matrixed_ = np.vstack([column_names, slr_matrix_matrixed])
 
 column_tokens = {column_name: i for i, column_name in enumerate(column_names)}
 slr_matrix_numeric = slr_matrix.replace(column_tokens)
 history_numeric = [column_tokens[token] for token in history]
 
+history_numeric.append(39)
+#print(slr_matrix_matrixed)
 print(history_numeric)
 
 grammar_original = {
@@ -321,26 +322,28 @@ grammar_original = {
     88: ("LIT", ["string"]),
 }
 
-
 estado_inicial = 0
 pila = [estado_inicial]
 
 def error():
-    print("Error");
+    print("Error")
     quit()
 
 def obtener_accion(estado, token):
     return slr_matrix_matrixed[estado][token]
 
 def obtener_reduccion(regla):
-    return grammar_original[regla]
+    rul = grammar_original[regla]
+    p1 = rul[0]
+    p1_n = column_tokens[p1]
+    p2 = rul[1]
+    p2_n = [column_tokens[token] for token in p2]
+    return (p1_n, p2_n)
 
 def aplicar_reduccion(red, stack):
     journey = len(red[1])
     print(journey)
     for i in range(journey):
-        print(stack[-2])
-        print(red[1][-1])
         if stack[-2] == red[1][-1]:
             stack.pop(-1)
             stack.pop(-1)
@@ -349,7 +352,35 @@ def aplicar_reduccion(red, stack):
             error()
     stack.append(red[0])
     print(stack)
+    return stack
 
-listTemp = ['0', 'DEF_LIST', '2', 'ID', '7', 'bracket1_op', '11', 'ID', '10', 'coma_op', '14', 'ID', '17', 'ID_LIST_CONT', '19']
+#listTemp = ['0', 'DEF_LIST', '2', 'ID', '7', 'bracket1_op', '11', 'ID', '10', 'coma_op', '14', 'ID', '17', 'ID_LIST_CONT', '19']
 
-aplicar_reduccion(obtener_reduccion(9),listTemp)
+#aplicar_reduccion(obtener_reduccion(9),listTemp)
+
+def sintacticMainSolver(pila, history_numeric):
+    if (len(pila) % 2) == 1:
+        act = obtener_accion(pila[-1], history_numeric[0])
+        print (act)
+        if act == "acc":
+            print("Funciona!!!")
+        elif str(act)[0] == 'r':
+            red = obtener_reduccion(int(act[1:]))
+            pila = aplicar_reduccion (red, pila)
+        elif str(act)[0] == 's':
+            pila.append(history_numeric[0])
+            pila.append(int((str(act)[1:])))
+            history_numeric.pop(0)
+        else:
+            error()
+        return pila, history_numeric
+    else:
+        act = obtener_accion(pila[-2], pila[-1])
+        print(act)
+        pila.append(int(act))
+        return pila, history_numeric
+
+for i in range(20):
+    pila, history_numeric = sintacticMainSolver(pila, history_numeric)
+    print(pila)
+    print(history_numeric)
