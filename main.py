@@ -223,28 +223,133 @@ slr_matrix_matrixed = slr_matrix.to_numpy()
 column_names = slr_matrix.columns.tolist()
 #slr_matrix_matrixed_ = np.vstack([column_names, slr_matrix_matrixed])
 
-#rules_path = input("Nombre de las reglas: ") + ".txt"
-rules_path = "Rules.txt"
-rules = load_grammar_rules(rules_path)
-if rules is not None:
-    print("Reglas gramaticales cargadas exitosamente:")
-    for rule in rules:
-        print(rule)
-
 column_tokens = {column_name: i for i, column_name in enumerate(column_names)}
 slr_matrix_numeric = slr_matrix.replace(column_tokens)
 history_numeric = [column_tokens[token] for token in history]
 
 print(history_numeric)
 
+grammar_original = {
+    0: ("P'", ["PROGRAM"]),
+    1: ("PROGRAM", ["DEF_LIST"]),
+    2: ("DEF_LIST", ["DEF_LIST", "DEF"]),
+    3: ("DEF_LIST", []),
+    4: ("DEF", ["VAR_DEF"]),
+    5: ("DEF", ["FUN_DEF"]),
+    6: ("VAR_DEF", ["var_kwd", "VAR_LIST", "limit_op"]),
+    7: ("VAR_LIST", ["ID_LIST"]),
+    8: ("ID_LIST", ["ID", "ID_LIST_CONT"]),
+    9: ("ID_LIST_CONT", ["coma_op", "ID", "ID_LIST_CONT"]),
+    10: ("ID_LIST_CONT", []),
+    11: ("FUN_DEF", ["ID", "bracket1_op", "PARAM_LIST", "bracket2_op", "curly1_op", "VAR_DEF_LIST", "STMT_LIST", "curly2_op"]),
+    12: ("PARAM_LIST", ["ID_LIST"]),
+    13: ("PARAM_LIST", []),
+    14: ("VAR_DEF_LIST", ["VAR_DEF_LIST", "VAR_DEF"]),
+    15: ("VAR_DEF_LIST", []),
+    16: ("STMT_LIST", ["STMT_LIST", "STMT"]),
+    17: ("STMT_LIST", []),
+    18: ("STMT", ["STMT_ASSIGN"]),
+    19: ("STMT", ["STMT_INCR"]),
+    20: ("STMT", ["STMT_DECR"]),
+    21: ("STMT", ["STMT_FUN_CALL"]),
+    22: ("STMT", ["STMT_IF"]),
+    23: ("STMT", ["STMT_WHILE"]),
+    24: ("STMT", ["STMT_DO_WHILE"]),
+    25: ("STMT", ["STMT_BREAK"]),
+    26: ("STMT", ["STMT_RETURN"]),
+    27: ("STMT", ["STMT_EMPTY"]),
+    28: ("STMT_ASSIGN", ["ID", "equal_op", "EXPR", "limit_op"]),
+    29: ("STMT_INCR", ["inc_kwd", "ID", "limit_op"]),
+    30: ("STMT_DECR", ["dec_kwd", "ID", "limit_op"]),
+    31: ("STMT_FUN_CALL", ["FUN_CALL", "limit_op"]),
+    32: ("FUN_CALL", ["ID", "bracket1_op", "EXPR_LIST", "bracket2_op"]),
+    33: ("EXPR_LIST", ["EXPR", "EXPR_LIST_CONT"]),
+    34: ("EXPR_LIST", []),
+    35: ("EXPR_LIST_CONT", ["coma_op", "EXPR", "EXPR_LIST_CONT"]),
+    36: ("EXPR_LIST_CONT", []),
+    37: ("STMT_IF", ["if_kwd", "bracket1_op", "EXPR", "bracket2_op", "curly1_op", "STMT_LIST", "curly2_op", "ELSE_IF_LIST", "ELSE"]),
+    38: ("ELSE_IF_LIST", ["ELSE_IF_LIST", "elseif_kwd", "bracket1_op", "EXPR", "bracket2_op", "curly1_op", "STMT_LIST", "curly2_op"]),
+    39: ("ELSE_IF_LIST", []),
+    40: ("ELSE_IF", ["elseif_kwd", "bracket1_op", "EXPR", "bracket2_op", "curly1_op", "STMT_LIST", "curly2_op"]),
+    41: ("ELSE", ["else_kwd", "curly1_op", "STMT_LIST", "curly2_op"]),
+    42: ("ELSE", []),
+    43: ("STMT_WHILE", ["while_kwd", "bracket1_op", "EXPR", "bracket2_op", "curly1_op", "STMT_LIST", "curly2_op"]),
+    44: ("STMT_DO_WHILE", ["do_kwd", "curly1_op", "STMT_LIST", "curly2_op", "while_kwd", "bracket1_op", "EXPR", "bracket2_op", "limit_op"]),
+    45: ("STMT_BREAK", ["break_kwd", "limit_op"]),
+    46: ("STMT_RETURN", ["return_kwd", "EXPR", "limit_op"]),
+    47: ("STMT_EMPTY", ["limit_op"]),
+    48: ("EXPR", ["EXPR_OR"]),
+    49: ("EXPR_OR", ["EXPR_OR", "OP_OR", "EXPR_AND"]),
+    50: ("OP_OR", ["or_op"]),
+    51: ("OP_OR", ["xor_op"]),
+    52: ("EXPR_OR", ["EXPR_AND"]),
+    53: ("EXPR_AND", ["EXPR_AND", "and_op", "EXPR_COMP"]),
+    54: ("EXPR_AND", ["EXPR_COMP"]),
+    55: ("EXPR_COMP", ["EXPR_COMP", "OP_COMP", "EXPR_REL"]),
+    56: ("EXPR_COMP", ["EXPR_REL"]),
+    57: ("OP_COMP", ["equal_equal_op"]),
+    58: ("OP_COMP", ["not_equal_op"]),
+    59: ("EXPR_REL", ["EXPR_REL", "OP_REL", "EXPR_ADD"]),
+    60: ("EXPR_REL", ["EXPR_ADD"]),
+    61: ("OP_REL", ["lesser_op"]),
+    62: ("OP_REL", ["lesser_equal_op"]),
+    63: ("OP_REL", ["greater_op"]),
+    64: ("OP_REL", ["greater_eq_op"]),
+    65: ("EXPR_ADD", ["EXPR_ADD", "OP_ADD", "EXPR_MUL"]),
+    66: ("EXPR_ADD", ["EXPR_MUL"]),
+    67: ("OP_ADD", ["plus_op"]),
+    68: ("OP_ADD", ["minus_op"]),
+    69: ("EXPR_MUL", ["EXPR_MUL", "OP_MUL", "EXPR_UNARY"]),
+    70: ("EXPR_MUL", ["EXPR_UNARY"]),
+    71: ("OP_MUL", ["multi_op"]),
+    72: ("OP_MUL", ["div_op"]),
+    73: ("OP_MUL", ["reminder_op"]),
+    74: ("EXPR_UNARY", ["OP_UNARY", "EXPR_UNARY"]),
+    75: ("EXPR_UNARY", ["EXPR_PRIMARY"]),
+    76: ("OP_UNARY", ["plus_op"]),
+    77: ("OP_UNARY", ["minus_op"]),
+    78: ("OP_UNARY", ["not_op"]),
+    79: ("EXPR_PRIMARY", ["ID"]),
+    80: ("EXPR_PRIMARY", ["FUN_CALL"]),
+    81: ("EXPR_PRIMARY", ["ARRAY"]),
+    82: ("EXPR_PRIMARY", ["LIT"]),
+    83: ("EXPR_PRIMARY", ["bracket1_op", "EXPR", "bracket2_op"]),
+    84: ("ARRAY", ["sqrbracket1_op", "EXPR_LIST", "sqrbracket2_op"]),
+    85: ("LIT", ["bool_kwd"]),
+    86: ("LIT", ["number"]),
+    87: ("LIT", ["character"]),
+    88: ("LIT", ["string"]),
+}
+
+
 estado_inicial = 0
 pila = [estado_inicial]
 
+def error():
+    print("Error");
+    quit()
 
 def obtener_accion(estado, token):
     return slr_matrix_matrixed[estado][token]
 
-def aplicar_reduccion(regla):
-    return rules[regla]
+def obtener_reduccion(regla):
+    return grammar_original[regla]
 
-print (slr_matrix_matrixed[0][0])
+def aplicar_reduccion(red, stack):
+    journey = len(red[1])
+    print(journey)
+    for i in range(journey):
+        print(stack[-2])
+        print(red[1][-1])
+        if stack[-2] == red[1][-1]:
+            stack.pop(-1)
+            stack.pop(-1)
+            red[1].pop(-1)
+        else:
+            error()
+    stack.append(red[0])
+    print(stack)
+
+listTemp = ['0', 'DEF_LIST', '2', 'ID', '7', 'bracket1_op', '11', 'ID', '10', 'coma_op', '14', 'ID', '17', 'ID_LIST_CONT', '19']
+
+aplicar_reduccion(obtener_reduccion(9),listTemp)
