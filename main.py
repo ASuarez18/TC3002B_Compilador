@@ -1,4 +1,7 @@
 import pandas as pd
+from tabulate import tabulate as tab_funct
+import anytree as tree
+import copy
 import functions as fun
 
 #filename = input("Nombre del programa: ") + ".txt"
@@ -146,7 +149,7 @@ try:
     blocked = False
     with open(filename, 'r') as file:
         fileContent = file.readlines()
-        print("\n Exito en lectura de archivo")
+        #print("\n Exito en lectura de archivo")
         file.close()
 
         state = 0 # Estado
@@ -192,7 +195,7 @@ except IOError:
     print ("\nError al abrir el archivo")
 
 
-print(history)
+
 
 def load_slr_matrix(file_path):
     try:
@@ -214,6 +217,7 @@ def load_grammar_rules(file_path):
 #matrix_path = input("Nombre de la matriz: ") + ".xlsx"
 matrix_path = "Transitions.xlsx"
 slr_matrix = load_slr_matrix(matrix_path)
+print(slr_matrix)
 if slr_matrix is not None:
     print("Matriz SLR cargada exitosamente.")
     #print(slr_matrix)
@@ -363,6 +367,7 @@ def sintacticMainSolver(pila, history_numeric):
         print (act)
         if act == "acc":
             print("Funciona!!!")
+            return ['acc', 'acc']
         elif str(act)[0] == 'r':
             red = obtener_reduccion(int(act[1:]))
             pila = aplicar_reduccion (red, pila)
@@ -379,7 +384,13 @@ def sintacticMainSolver(pila, history_numeric):
         pila.append(int(act))
         return pila, history_numeric
 
+res = []
+
 for i in range(20):
     pila, history_numeric = sintacticMainSolver(pila, history_numeric)
-    print(pila)
-    print(history_numeric)
+    res.append([copy.deepcopy(pila), copy.deepcopy(history_numeric)])
+    # print(pila)
+    # print(history_numeric)
+
+header = ["pila", "hystory"]
+print(tab_funct(res, headers=header, tablefmt="grid"))
