@@ -23,22 +23,22 @@ def checkState(state, char, word, blocked):
     elif char in operators and not blocked:
         newState = 3
 
-    elif char == '<' and not blocked and state != 8:
+    elif char == '<' and not blocked and state in [0, 19, 1]:
         newState = 8
 
-    elif char == '>' and not blocked:
+    elif char == '>' and not blocked and state in [0, 19, 1]:
         newState = 14
 
-    elif char == '=' and not blocked:
+    elif char == '=' and not blocked and state in [0, 19, 1]:
         newState = 15
 
-    elif char == '!' and not blocked:
+    elif char == '!' and not blocked and state in [0, 19, 1, 3]:
         newState = 16
 
-    elif char == '|' and not blocked:
+    elif char == '|' and not blocked and state in [0, 19, 1]:
         newState = 17
 
-    elif char == '&' and not blocked:
+    elif char == '&' and not blocked and state in [0, 19, 1]:
         newState = 18
 
     elif char in reset and not blocked:
