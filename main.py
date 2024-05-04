@@ -1,11 +1,11 @@
 import pandas as pd
 from tabulate import tabulate as tab_funct
-import anytree as tree
+from anytree import Node, RenderTree
 import copy
 import functions as fun
 
 #filename = input("Nombre del programa: ") + ".txt"
-filename = "t.txt"
+filename = "u.txt"
 fileContent = []
 operators = [ '+', '-', '*', '/', '%', '^', '[', ']', '(', ')', ';', '{', '}', ',']
 reset = [' ', '\n']
@@ -358,18 +358,26 @@ def aplicar_reduccion(red, stack):
     return stack
 
 #listTemp = ['0', 'DEF_LIST', '2', 'ID', '7', 'bracket1_op', '11', 'ID', '10', 'coma_op', '14', 'ID', '17', 'ID_LIST_CONT', '19']
-
+redList = []
 #aplicar_reduccion(obtener_reduccion(9),listTemp)
 
+print(pila)
+print(history_numeric)
+
+res = [[copy.deepcopy(pila), copy.deepcopy(history_numeric)]]
+
+finished = False
 def sintacticMainSolver(pila, history_numeric):
     if (len(pila) % 2) == 1:
         act = obtener_accion(pila[-1], history_numeric[0])
         print (act)
         if act == "acc":
             print("Funciona!!!")
-            return ['acc', 'acc']
+            return [], []
+            # return ['acc', 'acc']
         elif str(act)[0] == 'r':
             red = obtener_reduccion(int(act[1:]))
+            redList.append(int(act[1:]))
             pila = aplicar_reduccion (red, pila)
         elif str(act)[0] == 's':
             pila.append(history_numeric[0])
@@ -384,13 +392,84 @@ def sintacticMainSolver(pila, history_numeric):
         pila.append(int(act))
         return pila, history_numeric
 
-res = []
-
-for i in range(20):
+while True:
     pila, history_numeric = sintacticMainSolver(pila, history_numeric)
+    if len(pila) == 0 and len(history_numeric) == 0:
+        break
     res.append([copy.deepcopy(pila), copy.deepcopy(history_numeric)])
-    # print(pila)
-    # print(history_numeric)
+    print(pila)
+    print(history_numeric)
 
-header = ["pila", "hystory"]
-print(tab_funct(res, headers=header, tablefmt="grid"))
+trace = []
+
+for i in res:
+    cnt = 0
+    temp1 = []
+    for j in i[0]:
+        if cnt % 2 == 0:
+            temp1.append(j)
+        else:
+            temp1.append(column_names[int(j)])
+        cnt+=1
+    temp2 = []
+    for k in i[1]:
+        temp2.append(column_names[k])
+    temp3=[]
+    temp3.append(temp1)
+    temp3.append(temp2)
+    trace.append(temp3)
+
+
+header = ["Stack", "Input"]
+print(tab_funct(trace, headers=header, tablefmt="grid"))
+
+
+fatherlessNodes = []
+redTrans = []
+
+
+for item in (redList):
+    red = grammar_original[item]
+    redTrans.append(red)
+
+
+
+for i in range(len(redList)):
+    tempNode=Node(redTrans[i][0])
+    if len(redTrans[i][1]) > 0:
+        for x in redTrans[i][1]:
+            found = False
+            for y in fatherlessNodes:
+                # print(y.name)
+                if x == y.name:
+                    y.parent = tempNode
+                    fatherlessNodes.remove(y)
+                    found = True
+            if not found:
+                Node(x, parent = tempNode)
+    fatherlessNodes.append(tempNode)
+
+            
+for pre, _, node in RenderTree(fatherlessNodes[0]):
+    print("%s%s" % (pre, node.name))
+
+# for item in (redTrans):
+#     print(item)
+
+
+# nodes_dict = {}
+# # Crear nodos
+# for tupla in redList:
+#     parent_name, children_names = tupla
+#     if parent_name not in nodes_dict:
+#         nodes_dict[parent_name] = Node(parent_name)
+#     parent_node = nodes_dict[parent_name]
+#     for child_name in children_names:
+#         if child_name not in nodes_dict:
+#             nodes_dict[child_name] = Node(child_name)
+#         child_node = nodes_dict[child_name]
+#         child_node.parent = parent_node
+
+# # Imprimir el árbol
+# for pre, _, node in RenderTree(nodes_dict['PROGRAM']):
+#     print("%s%s" % (pre, node.name))
