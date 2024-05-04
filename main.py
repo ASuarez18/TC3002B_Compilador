@@ -448,7 +448,6 @@ for i in res:
     trace.append(temp3)
 
 table = [x + [y] for x, y in zip(trace, acts)]
-print(table)
 
 header = ["Stack", "Input", "Action"]
 print(tab_funct(table, headers=header, tablefmt="grid"))
