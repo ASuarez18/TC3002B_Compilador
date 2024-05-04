@@ -23,22 +23,22 @@ def checkState(state, char, word, blocked):
     elif char in operators and not blocked:
         newState = 3
 
-    elif char == '<' and not blocked and state != 8:
+    elif char == '<' and not blocked and state in [0, 19, 1]:
         newState = 8
 
-    elif char == '>' and not blocked:
+    elif char == '>' and not blocked and state in [0, 19, 1]:
         newState = 14
 
-    elif char == '=' and not blocked:
+    elif char == '=' and not blocked and state in [0, 19, 1]:
         newState = 15
 
-    elif char == '!' and not blocked:
+    elif char == '!' and not blocked and state in [0, 19, 1, 3]:
         newState = 16
 
-    elif char == '|' and not blocked:
+    elif char == '|' and not blocked and state in [0, 19, 1]:
         newState = 17
 
-    elif char == '&' and not blocked:
+    elif char == '&' and not blocked and state in [0, 19, 1]:
         newState = 18
 
     elif char in reset and not blocked:
@@ -343,11 +343,13 @@ def posibles(estado):
     return columns_without_nan
 
 def error(historical, estado):
-    pos = len(history) - len(historical) + 2
+    pos = len(history) - len(historical) + 1
+    print(pos)
+    print()
     found = False
     for i in range(len(lines)):
         if lines[i] >= pos:
-            print("Error en la línea", i, "con un caracter inesperado.")
+            print("Error en la línea", i+1, "con un caracter inesperado.")
             found = True
             break
     if found == False:
