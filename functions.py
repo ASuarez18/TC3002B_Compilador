@@ -48,7 +48,7 @@ def operator(char):
         case ';': return "limit_op"
         case '{': return "curly1_op"
         case '}': return "curly2_op"
-        case ',': return "comma_op"
+        case ',': return "coma_op"
         
 
 

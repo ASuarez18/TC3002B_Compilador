@@ -4,12 +4,12 @@ from anytree import Node, RenderTree
 import copy
 import functions as fun
 
-#filename = input("Nombre del programa: ") + ".txt"
-filename = "u.txt"
+filename = input("Nombre del programa: ") + ".txt"
 fileContent = []
 operators = [ '+', '-', '*', '/', '%', '^', '[', ']', '(', ')', ';', '{', '}', ',']
 reset = [' ', '\n']
 history = []
+lines = []
 word = ""
 
 def checkState(state, char, word, blocked):
@@ -157,6 +157,11 @@ try:
 
         for line in fileContent:
             for char in line:
+                if char == '\n':
+                    lines.append(len(history))
+                if state == 404:
+                    print("Error, caracter inesperado en la línea", len(lines))
+                    quit()
                 state = checkState(state, char, word, blocked)
                 if state != 1:
                     word = ""
@@ -196,7 +201,6 @@ except IOError:
 
 
 
-
 def load_slr_matrix(file_path):
     try:
         slr_matrix = pd.read_excel(file_path)
@@ -217,7 +221,6 @@ def load_grammar_rules(file_path):
 #matrix_path = input("Nombre de la matriz: ") + ".xlsx"
 matrix_path = "Transitions.xlsx"
 slr_matrix = load_slr_matrix(matrix_path)
-print(slr_matrix)
 if slr_matrix is not None:
     print("Matriz SLR cargada exitosamente.")
     #print(slr_matrix)
@@ -230,8 +233,6 @@ slr_matrix_numeric = slr_matrix.replace(column_tokens)
 history_numeric = [column_tokens[token] for token in history]
 
 history_numeric.append(39)
-#print(slr_matrix_matrixed)
-print(history_numeric)
 
 grammar_original = {
     0: ("P'", ["PROGRAM"]),
@@ -328,8 +329,34 @@ grammar_original = {
 estado_inicial = 0
 pila = [estado_inicial]
 
-def error():
-    print("Error")
+def posibles(estado):
+    row = slr_matrix_matrixed[estado]
+
+    columns_without_nan = []
+
+    for col_index, element in enumerate(row):
+        if str(element) != "nan" and col_index < 39:
+            columns_without_nan.append(col_index)   
+        
+    return columns_without_nan
+
+def error(historical, estado):
+    pos = len(history) - len(historical) + 2
+    found = False
+    for i in range(len(lines)):
+        if lines[i] >= pos:
+            print("Error en la línea", i, "con un caracter inesperado.")
+            found = True
+            break
+    if found == False:
+        print("Error en la línea", len(lines), "con un caracter inesperado.")
+    if column_names[historical[0]] == "$":
+        print("Se terminó el código de manera inesperada")
+    else:
+        print("Se recibió un", column_names[historical[0]])
+    cols = posibles(estado)
+    print("Posibles caracteres:", [column_names[token] for token in cols])
+    print("Revisar la documentación para más información sobre el error. Los posibles caracteres no indican el error específico.")
     quit()
 
 def obtener_accion(estado, token):
@@ -343,26 +370,24 @@ def obtener_reduccion(regla):
     p2_n = [column_tokens[token] for token in p2]
     return (p1_n, p2_n)
 
-def aplicar_reduccion(red, stack):
+def aplicar_reduccion(red, stack, historical, estado):
     journey = len(red[1])
-    print(journey)
     for i in range(journey):
         if stack[-2] == red[1][-1]:
             stack.pop(-1)
             stack.pop(-1)
             red[1].pop(-1)
         else:
-            error()
+            error(historical, estado)
     stack.append(red[0])
-    print(stack)
     return stack
 
 #listTemp = ['0', 'DEF_LIST', '2', 'ID', '7', 'bracket1_op', '11', 'ID', '10', 'coma_op', '14', 'ID', '17', 'ID_LIST_CONT', '19']
 redList = []
 #aplicar_reduccion(obtener_reduccion(9),listTemp)
 
-print(pila)
-print(history_numeric)
+#print(pila)
+#print(history_numeric)
 
 res = [[copy.deepcopy(pila), copy.deepcopy(history_numeric)]]
 
@@ -370,25 +395,22 @@ finished = False
 def sintacticMainSolver(pila, history_numeric):
     if (len(pila) % 2) == 1:
         act = obtener_accion(pila[-1], history_numeric[0])
-        print (act)
         if act == "acc":
-            print("Funciona!!!")
             return [], []
-            # return ['acc', 'acc']
         elif str(act)[0] == 'r':
             red = obtener_reduccion(int(act[1:]))
             redList.append(int(act[1:]))
-            pila = aplicar_reduccion (red, pila)
+            pila = aplicar_reduccion (red, pila, history_numeric, pila[-1])
         elif str(act)[0] == 's':
             pila.append(history_numeric[0])
             pila.append(int((str(act)[1:])))
             history_numeric.pop(0)
         else:
-            error()
+            error(history_numeric, pila[-1])
         return pila, history_numeric
     else:
         act = obtener_accion(pila[-2], pila[-1])
-        print(act)
+        #print(act)
         pila.append(int(act))
         return pila, history_numeric
 
@@ -397,8 +419,8 @@ while True:
     if len(pila) == 0 and len(history_numeric) == 0:
         break
     res.append([copy.deepcopy(pila), copy.deepcopy(history_numeric)])
-    print(pila)
-    print(history_numeric)
+    #print(pila)
+    #print(history_numeric)
 
 trace = []
 
@@ -452,24 +474,3 @@ for i in range(len(redList)):
             
 for pre, _, node in RenderTree(fatherlessNodes[0]):
     print("%s%s" % (pre, node.name))
-
-# for item in (redTrans):
-#     print(item)
-
-
-# nodes_dict = {}
-# # Crear nodos
-# for tupla in redList:
-#     parent_name, children_names = tupla
-#     if parent_name not in nodes_dict:
-#         nodes_dict[parent_name] = Node(parent_name)
-#     parent_node = nodes_dict[parent_name]
-#     for child_name in children_names:
-#         if child_name not in nodes_dict:
-#             nodes_dict[child_name] = Node(child_name)
-#         child_node = nodes_dict[child_name]
-#         child_node.parent = parent_node
-
-# # Imprimir el árbol
-# for pre, _, node in RenderTree(nodes_dict['PROGRAM']):
-#     print("%s%s" % (pre, node.name))
