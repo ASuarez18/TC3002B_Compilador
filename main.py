@@ -32,7 +32,7 @@ def checkState(state, char, word, blocked):
     elif char == '=' and not blocked and state in [0, 19, 1]:
         newState = 15
 
-    elif char == '!' and not blocked and state in [0, 19, 1, 3]:
+    elif char == '!' and not blocked and state in [0, 19, 1, 3, 16]:
         newState = 16
 
     elif char == '|' and not blocked and state in [0, 19, 1]:
@@ -66,7 +66,7 @@ def checkState(state, char, word, blocked):
     
     elif char == '=' and not blocked and state == 14:
         newState = 20
-        history.append("greater_equal_op")
+        history.append("greater_eq_op")
 
     elif char == '=' and not blocked and state == 15:
         newState = 20
@@ -160,7 +160,7 @@ try:
                 if char == '\n':
                     lines.append(len(history))
                 if state == 404:
-                    print("Error, caracter inesperado en la línea", len(lines))
+                    print("Error, caracter inesperado en la línea", len(lines))+1
                     print(char)
                     print(history)
                     quit()
