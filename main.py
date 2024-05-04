@@ -26,19 +26,19 @@ def checkState(state, char, word, blocked):
     elif char == '<' and not blocked and state != 8:
         newState = 8
 
-    elif char == '>' and not blocked and state in [0,19]:
+    elif char == '>' and not blocked:
         newState = 14
 
-    elif char == '=' and not blocked and state in [0,19]:
+    elif char == '=' and not blocked:
         newState = 15
 
-    elif char == '!' and not blocked and state in [0,19,3]:
+    elif char == '!' and not blocked:
         newState = 16
 
-    elif char == '|' and not blocked and state in [0,19]:
+    elif char == '|' and not blocked:
         newState = 17
 
-    elif char == '&' and not blocked and state in [0,19]:
+    elif char == '&' and not blocked:
         newState = 18
 
     elif char in reset and not blocked:
