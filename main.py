@@ -452,7 +452,7 @@ for i in res:
 table = [x + [y] for x, y in zip(trace, acts)]
 
 header = ["Stack", "Input", "Action"]
-print(tab_funct(table, headers=header, tablefmt="grid"))
+# print(tab_funct(table, headers=header, tablefmt="grid"))
 
 
 fatherlessNodes = []
