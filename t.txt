@@ -3,4 +3,4 @@
 
 # CEM
 
-as==two
+var A
