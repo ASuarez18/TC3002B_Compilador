@@ -390,11 +390,13 @@ redList = []
 #print(history_numeric)
 
 res = [[copy.deepcopy(pila), copy.deepcopy(history_numeric)]]
+acts = []
 
 finished = False
 def sintacticMainSolver(pila, history_numeric):
     if (len(pila) % 2) == 1:
         act = obtener_accion(pila[-1], history_numeric[0])
+        acts.append(act)
         if act == "acc":
             return [], []
         elif str(act)[0] == 'r':
@@ -410,9 +412,11 @@ def sintacticMainSolver(pila, history_numeric):
         return pila, history_numeric
     else:
         act = obtener_accion(pila[-2], pila[-1])
+        acts.append(act)
         #print(act)
         pila.append(int(act))
         return pila, history_numeric
+    
 
 while True:
     pila, history_numeric = sintacticMainSolver(pila, history_numeric)
@@ -441,9 +445,11 @@ for i in res:
     temp3.append(temp2)
     trace.append(temp3)
 
+table = [x + [y] for x, y in zip(trace, acts)]
+print(table)
 
-header = ["Stack", "Input"]
-print(tab_funct(trace, headers=header, tablefmt="grid"))
+header = ["Stack", "Input", "Action"]
+print(tab_funct(table, headers=header, tablefmt="grid"))
 
 
 fatherlessNodes = []
