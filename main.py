@@ -198,8 +198,10 @@ try:
 
 except FileNotFoundError:
     print ("\nEl archivo no fue encontrado")
+    quit()
 except IOError:
     print ("\nError al abrir el archivo")
+    quit()
 
 
 
