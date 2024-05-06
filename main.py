@@ -184,7 +184,7 @@ try:
                     print(history)
                     quit()
                 state = checkState(state, char, word, blocked, lineCnt)
-                if state != 1:
+                if state != 1 and state != 2:
                     word = ""
                 
                 match state:
@@ -193,6 +193,8 @@ try:
                         blocked = False
                     # Alpha state
                     case 1: 
+                        word += char
+                    case 2:
                         word += char
                     case 3: 
                         token = fun.operator(char)
@@ -511,3 +513,72 @@ for i in range(len(redList)):
             
 for pre, _, node in RenderTree(fatherlessNodes[0]):
     print("%s%s" % (pre, node.name))
+
+def determinar_tipo(id_token, tabla):
+    index = tabla.index(id_token)
+    siguiente_token = tabla[index + 1] if index + 1 < len(tabla) else None
+    if siguiente_token and siguiente_token[0] == '(':
+        return "función"
+    else:
+        return "variable"
+
+# Generar nueva tabla con etiquetas de tipo
+IDs = []
+for inst in lexTable:
+    if inst[1] == "ID":
+        tipo = determinar_tipo(inst, lexTable)
+        IDs.append([inst[0], tipo, inst[2]])
+
+def identificarContexto(tabla, token):
+    decs = []
+    context = [0]
+    level = 0
+    for i in range(len(tabla)):
+        if tabla[i][1] == "var_kwd":
+            decs.append(tabla[i][2])
+        elif tabla[i][1] == "curly1_op":
+            if(len(context)-1 <= level):
+                context.append(1)
+            else:
+                print(context,level)
+                context[level+1] += 1
+            level += 1
+        elif tabla[i][1] == "curly2_op":
+            if(len(context) > level+1):
+                context.pop()
+            level -= 1
+        if tabla[i][0] == token:
+            pre = tabla[i-1][1]
+            post = tabla[i+1][1]
+            if(tabla[i][2] in decs):
+                return token, context, level
+    return token, -1, -1
+
+tokens = []
+
+for i in range(len(IDs)):
+    if IDs[i][1] == "función":
+        IDs[i].append(0)
+    elif IDs[i][0] not in tokens:
+        tokens.append(IDs[i][0])
+
+print(tokens)
+contexts = []
+
+for token in tokens:
+    token, context, level = identificarContexto(lexTable, token)
+    if level != -1:
+        con = ""
+        for item in context:
+            con += str(item) + "."
+        contexts.append([token,con])
+    else:
+        contexts.append([token,-1])
+
+for item in contexts:
+    for id in IDs:
+        if id[0] == item[0]:
+            id.append(item[1])
+
+headers2=['Token','ID','Línea','Contexto']
+print(tab_funct(IDs, headers=headers2, tablefmt="pretty"))
