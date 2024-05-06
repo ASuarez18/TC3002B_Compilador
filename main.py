@@ -226,11 +226,9 @@ except IOError:
     print ("\nError al abrir el archivo")
     quit()
 
-# Encabezados de la tabla
+print("\n\n-------------------- Análisis Lexico -------------------")
 headers = ["Token", "Identificador", "No. Linea"]
-# Imprimir la tabla
 print(tab_funct(lexTable, headers=headers, tablefmt="pretty"))
-# print(lexTable)
 
 def load_slr_matrix(file_path):
     try:
@@ -249,12 +247,10 @@ def load_grammar_rules(file_path):
         print("Error al cargar las reglas gramaticales:", e)
         return None
 
-#matrix_path = input("Nombre de la matriz: ") + ".xlsx"
 matrix_path = "Transitions.xlsx"
 slr_matrix = load_slr_matrix(matrix_path)
-if slr_matrix is not None:
-    print("Matriz SLR cargada exitosamente.")
-    #print(slr_matrix)
+# if slr_matrix is not None:
+#     print("Matriz SLR cargada exitosamente.")
 
 slr_matrix_matrixed = slr_matrix.to_numpy()
 column_names = slr_matrix.columns.tolist()
@@ -415,12 +411,8 @@ def aplicar_reduccion(red, stack, historical, estado):
     stack.append(red[0])
     return stack
 
-#listTemp = ['0', 'DEF_LIST', '2', 'ID', '7', 'bracket1_op', '11', 'ID', '10', 'coma_op', '14', 'ID', '17', 'ID_LIST_CONT', '19']
 redList = []
-#aplicar_reduccion(obtener_reduccion(9),listTemp)
 
-#print(pila)
-#print(history_numeric)
 
 res = [[copy.deepcopy(pila), copy.deepcopy(history_numeric)]]
 acts = []
@@ -449,15 +441,12 @@ def sintacticMainSolver(pila, history_numeric):
         #print(act)
         pila.append(int(act))
         return pila, history_numeric
-    
 
 while True:
     pila, history_numeric = sintacticMainSolver(pila, history_numeric)
     if len(pila) == 0 and len(history_numeric) == 0:
         break
     res.append([copy.deepcopy(pila), copy.deepcopy(history_numeric)])
-    #print(pila)
-    #print(history_numeric)
 
 trace = []
 
@@ -480,9 +469,9 @@ for i in res:
 
 table = [x + [y] for x, y in zip(trace, acts)]
 
+
 # header = ["Stack", "Input", "Action"]
 # print(tab_funct(table, headers=header, tablefmt="pretty"))
-
 
 fatherlessNodes = []
 redTrans = []
@@ -500,7 +489,6 @@ for i in range(len(redList)):
         for x in redTrans[i][1]:
             found = False
             for y in fatherlessNodes:
-                # print(y.name)
                 if x == y.name:
                     y.parent = tempNode
                     fatherlessNodes.remove(y)
@@ -509,7 +497,7 @@ for i in range(len(redList)):
                 Node(x, parent = tempNode)
     fatherlessNodes.append(tempNode)
 
-            
+print("\n\n-------------------- Árbol Sintáctico -------------------")
 for pre, _, node in RenderTree(fatherlessNodes[0]):
     print("%s%s" % (pre, node.name))
 
@@ -521,7 +509,7 @@ def determinar_tipo(id_token, tabla):
     else:
         return "variable"
 
-# Generar nueva tabla con etiquetas de tipo
+
 IDs = []
 for inst in lexTable:
     if inst[1] == "ID":
@@ -577,5 +565,6 @@ for item in contexts:
         if id[0] == item[0]:
             id.append(item[1])
 
+print("\n\n-------------------- Contexto -------------------")
 headers2=['Token','ID','Línea','Contexto']
 print(tab_funct(IDs, headers=headers2, tablefmt="pretty"))

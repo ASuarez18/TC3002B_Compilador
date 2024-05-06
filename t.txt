@@ -4,3 +4,5 @@
 # CEM
 
 var A;
+|
+var B;

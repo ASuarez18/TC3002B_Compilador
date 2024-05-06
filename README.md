@@ -45,7 +45,7 @@ Para ejecutar el programa se deben seguir los siguientes pasos:
      Nombre del programa: falak
     ```
 4. Si el programa contenido en el archivo de texto no presenta errores, se mostrará en la terminal el árbol sintáctico de este. Véase un ejemplo a continuación:
-    1. Archivo Falak:
+    1. Archivo Falak analizado:
     ```txt
     <# a
     #>
@@ -54,7 +54,17 @@ Para ejecutar el programa se deben seguir los siguientes pasos:
 
     var A;
     ```
-    2. Arból sintáctico:
+    2. Tabla de análisis lexico
+    ```sh
+    +-------+---------------+-----------+
+    | Token | Identificador | No. Linea |
+    +-------+---------------+-----------+
+    |  var  |    var_kwd    |     6     |
+    |   A   |      ID       |     6     |
+    |   ;   |   limit_op    |     6     |
+    +-------+---------------+-----------+
+    ```
+    3. Arból sintáctico:
     ```sh
     PROGRAM
     └── DEF_LIST
@@ -68,7 +78,20 @@ Para ejecutar el programa se deben seguir los siguientes pasos:
                 │       └── ID_LIST_CONT
                 └── limit_op
     ```
-    En caso de presentar errores, se mostrará lo siguiente:
+    4. Tabla de contexto
+    ```sh
+    +-------+----------+-------+----------+
+    | Token |    ID    | Línea | Contexto |
+    +-------+----------+-------+----------+
+    |   A   | variable |   6   |    0.    |
+    +-------+----------+-------+----------+
+    ```
+    1. En caso de presentar **errores lexicos**, se mostrará lo siguiente:
+    ```sh
+    Error, caracter inesperado en la línea 7
+    ['var_kwd', 'ID', 'limit_op', 'Error']
+    ```
+    2. Y cuando es un **error sintáctico** se obtiene lo siguiente:
     ```sh
     Error en la línea 6 con un caracter inesperado.
     Se terminó el código de manera inesperada
