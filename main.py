@@ -172,20 +172,19 @@ try:
         err = False # Error
 
         lineCnt = 0
-
         for line in fileContent:
             lineCnt += 1
             for char in line:
                 if char == '\n':
                     lines.append(len(history))
                 if state == 404:
-                    print("Error, caracter inesperado en la línea", len(lines))+1
-                    print(char)
+                    print("Error, caracter inesperado en la línea", len(lines))
                     print(history)
                     quit()
                 state = checkState(state, char, word, blocked, lineCnt)
                 if state != 1 and state != 2:
                     word = ""
+
                 
                 match state:
                     # Init Restart state
