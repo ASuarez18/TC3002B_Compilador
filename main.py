@@ -540,7 +540,6 @@ def identificarContexto(tabla, token):
             if(len(context)-1 <= level):
                 context.append(1)
             else:
-                print(context,level)
                 context[level+1] += 1
             level += 1
         elif tabla[i][1] == "curly2_op":
@@ -562,7 +561,6 @@ for i in range(len(IDs)):
     elif IDs[i][0] not in tokens:
         tokens.append(IDs[i][0])
 
-print(tokens)
 contexts = []
 
 for token in tokens:
