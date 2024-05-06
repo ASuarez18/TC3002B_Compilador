@@ -9,10 +9,11 @@ fileContent = []
 operators = [ '+', '-', '*', '/', '%', '^', '[', ']', '(', ')', ';', '{', '}', ',']
 reset = [' ', '\n']
 history = []
+lexTable =[]
 lines = []
 word = ""
 
-def checkState(state, char, word, blocked):
+def checkState(state, char, word, blocked, lineCnt):
     newState = -1
     if char.isdigit() and not blocked and state != 1:
         newState = 2
@@ -55,34 +56,42 @@ def checkState(state, char, word, blocked):
     elif char == '\'' and not blocked:
         newState = 6
         history.append("character")
+        lexTable.append([char, "character", lineCnt])
 
     elif char == '"' and not blocked:
         newState = 7
         history.append("string")
+        lexTable.append([char, "string", lineCnt])
 
     elif char == '=' and not blocked and state == 8:
         newState = 20
         history.append("lesser_equal_op")
+        lexTable.append(["<=", "lesser_equal_op", lineCnt])
     
     elif char == '=' and not blocked and state == 14:
         newState = 20
         history.append("greater_eq_op")
+        lexTable.append([">=", "greater_eq_op", lineCnt])
 
     elif char == '=' and not blocked and state == 15:
         newState = 20
         history.append("equal_equal_op")
+        lexTable.append(["==", "equal_equal_op", lineCnt])
 
     elif char == '=' and not blocked and state == 16:
         newState = 20
         history.append("not_equal_op")
+        lexTable.append(["!=", "not_equal_op", lineCnt])
 
     elif char == '|' and not blocked and state == 17:
         newState = 20
         history.append("or_op")
+        lexTable.append(["||", "or_op", lineCnt])
 
     elif char == '&' and not blocked and state == 18:
         newState = 20
         history.append("and_op")
+        lexTable.append(["&&", "and_op", lineCnt])
 
     elif char == '\n' and blocked and state == 4:
         newState = 0
@@ -117,22 +126,28 @@ def checkState(state, char, word, blocked):
     elif not blocked:
         newState = 404
         history.append("Error")
+        lexTable.append([char, "Error", lineCnt])
 
     if state == 8 and newState != 5 and newState != 20 and not blocked:
         history.append("lesser_op")
+        lexTable.append(["<", "lesser_op", lineCnt])
 
     if state == 14 and newState != 20 and not blocked:
         history.append("greater_op")
+        lexTable.append([">", "greater_op", lineCnt])
 
     if state == 15 and newState != 20 and not blocked:
         history.append("equal_op")
+        lexTable.append(["=", "equal_op", lineCnt])
 
     if state == 16 and newState != 20 and not blocked:
         history.append("not_op")
+        lexTable.append(["!", "not_op", lineCnt])
 
     if state in [17,18] and newState != 20 and not blocked:
         newState = 404
         history.append("Error")
+        lexTable.append([char, "Error", lineCnt])
 
     if state in [8, 14, 15, 16, 17, 18] and newState == 20 and not blocked:
         newState = 0
@@ -141,6 +156,7 @@ def checkState(state, char, word, blocked):
         if state == 1 or state == 2:
             token = fun.changeState(state, word)
             history.append(token)
+            lexTable.append([word, token, lineCnt])
         return newState
     else:
         return state
@@ -155,7 +171,10 @@ try:
         state = 0 # Estado
         err = False # Error
 
+        lineCnt = 0
+
         for line in fileContent:
+            lineCnt += 1
             for char in line:
                 if char == '\n':
                     lines.append(len(history))
@@ -164,7 +183,7 @@ try:
                     print(char)
                     print(history)
                     quit()
-                state = checkState(state, char, word, blocked)
+                state = checkState(state, char, word, blocked, lineCnt)
                 if state != 1:
                     word = ""
                 
@@ -178,6 +197,7 @@ try:
                     case 3: 
                         token = fun.operator(char)
                         history.append(token)
+                        lexTable.append([char, token, lineCnt])
                     case 4: 
                         blocked = True
                     case 5: 
@@ -190,9 +210,11 @@ try:
             if state == 1 or state == 2:
                 token = fun.changeState(state, word)
                 history.append(token)
+                lexTable.append([word, token, lineCnt])
             
             if state == 8:
                 history.append("lesser_op")
+                lexTable.append(["<", "lesser_op", lineCnt])
 
                     
 
@@ -203,7 +225,11 @@ except IOError:
     print ("\nError al abrir el archivo")
     quit()
 
-
+# Encabezados de la tabla
+headers = ["Token", "Identificador", "No. Linea"]
+# Imprimir la tabla
+print(tab_funct(lexTable, headers=headers, tablefmt="pretty"))
+# print(lexTable)
 
 def load_slr_matrix(file_path):
     try:
@@ -453,8 +479,8 @@ for i in res:
 
 table = [x + [y] for x, y in zip(trace, acts)]
 
-header = ["Stack", "Input", "Action"]
-# print(tab_funct(table, headers=header, tablefmt="grid"))
+# header = ["Stack", "Input", "Action"]
+# print(tab_funct(table, headers=header, tablefmt="pretty"))
 
 
 fatherlessNodes = []

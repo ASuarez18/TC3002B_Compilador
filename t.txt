@@ -3,4 +3,4 @@
 
 # CEM
 
-var A
+var A;
